@@ -46,7 +46,9 @@ logs/
 # Application specific
 application.properties
 
-
+# Artifacts
+*.gz
+*.mv.db
 
 
 

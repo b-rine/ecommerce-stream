@@ -11,15 +11,15 @@ fi
 
 # Start Kafka infrastructure
 echo "📦 Starting Kafka infrastructure..."
-docker-compose up -d
+docker compose up -d
 
 # Wait for Kafka to be ready
 echo "⏳ Waiting for Kafka to be ready..."
-sleep 15
+sleep 10
 
-# Check if Java 17+ is available
-if ! java -version 2>&1 | grep -q "version \"1[7-9]\|version \"[2-9]"; then
-    echo "❌ Java 17+ is required. Please install Java 17 or higher."
+# Check if Java 21+ is available
+if ! java -version 2>&1 | grep -q "version \"2[1-9]\|version \"[3-9]"; then
+    echo "❌ Java 21+ is required. Please install Java 21 or higher."
     exit 1
 fi
 
@@ -27,7 +27,7 @@ echo "☕ Java version check passed"
 
 # Build and run the Spring Boot application
 echo "🔨 Building Kotlin Spring Boot application..."
-./gradlew clean build -x test
+gradle clean build -x test
 
 if [ $? -ne 0 ]; then
     echo "❌ Build failed. Please check the error messages above."
@@ -46,7 +46,7 @@ echo "Press Ctrl+C to stop all services"
 cleanup() {
     echo ""
     echo "🛑 Shutting down services..."
-    docker-compose down
+    docker compose down
     echo "✅ All services stopped"
     exit 0
 }
