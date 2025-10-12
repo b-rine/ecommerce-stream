@@ -7,6 +7,7 @@ import com.ecommerce.kafkaecommerce.model.Order;
 import com.ecommerce.kafkaecommerce.model.Product;
 import com.ecommerce.kafkaecommerce.repository.ProductRepository;
 import com.ecommerce.kafkaecommerce.service.AnalyticsService;
+import com.ecommerce.kafkaecommerce.service.LogService;
 import com.ecommerce.kafkaecommerce.service.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -28,6 +29,9 @@ public class WebController {
     @Autowired
     private ProductRepository productRepository;
 
+    @Autowired
+    private LogService logService;
+
     @GetMapping("/")
     public String dashboard(Model model) {
         OrderStatsDto stats = analyticsService.getOrderStats();
@@ -39,9 +43,21 @@ public class WebController {
 
     @GetMapping("/logs")
     public String logs(Model model) {
-        List<Order> recentOrders = analyticsService.getRecentOrders();
-        model.addAttribute("orders", recentOrders);
+        List<LogService.LogEntry> logs = logService.getRecentLogs(50);
+        model.addAttribute("logs", logs);
         return "logs";
+    }
+
+    @GetMapping("/order/{orderId}")
+    public String orderDetails(@PathVariable String orderId, Model model) {
+        Optional<Order> orderOpt = orderService.getOrderByOrderId(orderId);
+        if (orderOpt.isPresent()) {
+            model.addAttribute("order", orderOpt.get());
+            return "order-details";
+        } else {
+            model.addAttribute("error", "Order not found: " + orderId);
+            return "error";
+        }
     }
 
     @GetMapping("/api/stats")

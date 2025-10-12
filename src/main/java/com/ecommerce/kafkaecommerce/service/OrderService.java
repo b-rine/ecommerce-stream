@@ -30,7 +30,7 @@ public class OrderService {
 
     public Order createOrder(Order order) {
         if (order.getOrderId() == null) {
-            order.setOrderId(UUID.randomUUID().toString());
+            order.setOrderId(generateOrderId());
         }
         order.setCreatedAt(LocalDateTime.now());
         order.setStatus(Order.OrderStatus.PENDING);
@@ -66,9 +66,12 @@ public class OrderService {
             orderItems.add(orderItem);
         }
         
+        // Generate standardized order ID
+        String orderId = generateOrderId();
+        
         // Create order
         Order order = new Order();
-        order.setOrderId(UUID.randomUUID().toString());
+        order.setOrderId(orderId);
         order.setCustomerName(request.getCustomerName());
         order.setCustomerEmail(request.getCustomerEmail());
         order.setTotalAmount(totalAmount);
@@ -82,6 +85,12 @@ public class OrderService {
         orderProducerService.sendOrderEvent(savedOrder);
         
         return savedOrder;
+    }
+
+    private String generateOrderId() {
+        // Get the next order number
+        long orderCount = orderRepository.count();
+        return String.format("ORD-%03d", orderCount + 1);
     }
 
     public List<Order> getAllOrders() {

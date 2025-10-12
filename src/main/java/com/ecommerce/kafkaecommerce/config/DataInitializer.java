@@ -39,23 +39,6 @@ public class DataInitializer implements CommandLineRunner {
             productRepository.saveAll(products);
         }
 
-        // Initialize sample orders
-        if (orderRepository.count() == 0) {
-            List<Order> orders = Arrays.asList(
-                new Order("ORD-001", "John Doe", "john@example.com", 
-                         new BigDecimal("999.99"), Order.OrderStatus.CONFIRMED,
-                         Arrays.asList(new Order.OrderItem("Laptop", 1, new BigDecimal("999.99")))),
-                new Order("ORD-002", "Jane Smith", "jane@example.com", 
-                         new BigDecimal("129.98"), Order.OrderStatus.SHIPPED,
-                         Arrays.asList(
-                             new Order.OrderItem("T-Shirt", 2, new BigDecimal("29.99")),
-                             new Order.OrderItem("Sneakers", 1, new BigDecimal("129.99"))
-                         )),
-                new Order("ORD-003", "Bob Johnson", "bob@example.com", 
-                         new BigDecimal("699.99"), Order.OrderStatus.PENDING,
-                         Arrays.asList(new Order.OrderItem("Smartphone", 1, new BigDecimal("699.99"))))
-            );
-            orderRepository.saveAll(orders);
-        }
+        // No sample orders - all orders will be user-generated
     }
 }

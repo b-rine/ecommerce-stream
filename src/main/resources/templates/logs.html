@@ -57,10 +57,17 @@
                         </div>
                         
                         <div class="log-container" id="logContainer">
-                            <div class="text-center text-muted py-5">
+                            <div th:if="${logs.empty}" class="text-center text-muted py-5">
                                 <i class="fas fa-file-alt fa-3x mb-3"></i>
-                                <p>Loading logs...</p>
+                                <p>No logs yet</p>
                                 <p><small>Logs will appear here as orders are processed through Kafka.</small></p>
+                            </div>
+                            <div th:each="log : ${logs}" th:class="'log-entry border-start border-3 ' + (${log.level == 'ERROR'} ? 'border-danger bg-danger bg-opacity-10' : ${log.level == 'WARN'} ? 'border-warning bg-warning bg-opacity-10' : 'border-info bg-info bg-opacity-10')">
+                                <div class="d-flex justify-content-between">
+                                    <span th:class="'badge ' + (${log.source == 'AnalyticsService'} ? 'bg-primary' : ${log.source == 'OrderProducerService'} ? 'bg-success' : 'bg-secondary')" th:text="${log.source}"></span>
+                                    <small class="text-muted" th:text="${#temporals.format(log.timestamp, 'HH:mm:ss')}"></small>
+                                </div>
+                                <div class="mt-1" th:text="${log.message}"></div>
                             </div>
                         </div>
                     </div>
@@ -119,46 +126,14 @@
             document.getElementById('errorLogs').textContent = errorCount;
         }
 
-        // Simulate log entries (in a real app, you'd stream these from the server)
-        function addSampleLogs() {
-            const logContainer = document.getElementById('logContainer');
-            const sampleLogs = [
-                { level: 'info', message: '2024-01-15 10:30:15 - INFO - AnalyticsService - Processing order from Kafka: ORD-1705317015123 for customer: Alice Johnson', source: 'Analytics' },
-                { level: 'info', message: '2024-01-15 10:30:14 - INFO - OrderProducerService - Order sent to Kafka: ORD-1705317015123 for customer: Alice Johnson', source: 'Producer' },
-                { level: 'info', message: '2024-01-15 10:29:45 - INFO - AnalyticsService - Order processed successfully: ORD-1705317015115 - Total: $129.98', source: 'Analytics' },
-                { level: 'info', message: '2024-01-15 10:29:44 - INFO - OrderProducerService - Order sent to Kafka: ORD-1705317015115 for customer: Bob Smith', source: 'Producer' }
-            ];
-            
-            logContainer.innerHTML = '';
-            
-            sampleLogs.forEach(log => {
-                const logEntry = document.createElement('div');
-                logEntry.className = `log-entry border-start border-3 ${
-                    log.level === 'error' ? 'border-danger bg-danger bg-opacity-10' :
-                    log.level === 'warn' ? 'border-warning bg-warning bg-opacity-10' :
-                    'border-info bg-info bg-opacity-10'
-                }`;
-                
-                logEntry.innerHTML = `
-                    <div class="d-flex justify-content-between">
-                        <span class="badge ${log.source === 'Analytics' ? 'bg-primary' : 'bg-success'}">${log.source}</span>
-                        <small class="text-muted">${log.message.split(' - ')[0]}</small>
-                    </div>
-                    <div class="mt-1">${log.message}</div>
-                `;
-                
-                logContainer.appendChild(logEntry);
-            });
-            
-            updateLogStats();
-        }
-
         // Initialize logs when page loads
         document.addEventListener('DOMContentLoaded', function() {
-            addSampleLogs();
+            updateLogStats();
             
-            // Auto-refresh every 10 seconds
-            setInterval(addSampleLogs, 10000);
+            // Auto-refresh every 5 seconds
+            setInterval(function() {
+                location.reload();
+            }, 5000);
         });
     </script>
 </body>

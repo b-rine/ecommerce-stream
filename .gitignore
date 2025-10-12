@@ -46,9 +46,15 @@ logs/
 # Application specific
 application.properties
 
+# H2 Database files
+*.mv.db
+*.trace.db
+*.lock.db
+*.h2.db
+data/
+
 # Artifacts
 *.gz
-*.mv.db
 
 
 
