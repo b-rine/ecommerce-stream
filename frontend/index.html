@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ecommerce Stream Dashboard</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🛒 Ecommerce Stream Dashboard</h1>
+            <p>Real-time event streaming with Apache Kafka</p>
+        </header>
+
+        <!-- Control Panel -->
+        <section class="control-panel">
+            <h2>Stream Controls</h2>
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">Start Stream</button>
+                <button id="stopBtn" class="btn btn-danger" disabled>Stop Stream</button>
+                <div class="status-indicator">
+                    <span id="statusText" class="status-text">Stopped</span>
+                    <span id="statusDot" class="status-dot stopped"></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Statistics Cards -->
+        <section class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-icon">📊</div>
+                <div class="stat-content">
+                    <h3 id="totalEvents">0</h3>
+                    <p>Total Events</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">💰</div>
+                <div class="stat-content">
+                    <h3 id="totalRevenue">$0.00</h3>
+                    <p>Total Revenue</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">🛍️</div>
+                <div class="stat-content">
+                    <h3 id="totalOrders">0</h3>
+                    <p>Total Orders</p>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div class="stat-content">
+                    <h3 id="uniqueUsers">0</h3>
+                    <p>Unique Users</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Charts Section -->
+        <section class="charts-section">
+            <div class="chart-container">
+                <h2>Revenue Over Time</h2>
+                <canvas id="revenueChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Events by Type</h2>
+                <canvas id="eventsChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Top Categories</h2>
+                <canvas id="categoriesChart"></canvas>
+            </div>
+            <div class="chart-container">
+                <h2>Events Per Minute</h2>
+                <canvas id="eventsPerMinuteChart"></canvas>
+            </div>
+        </section>
+
+        <!-- Event Stream -->
+        <section class="event-stream">
+            <h2>Real-time Event Stream</h2>
+            <div id="eventList" class="event-list"></div>
+        </section>
+    </div>
+
+    <script src="/static/js/websocket.js"></script>
+    <script src="/static/js/charts.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
