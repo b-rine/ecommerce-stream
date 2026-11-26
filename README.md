@@ -38,8 +38,8 @@ An ecommerce event streaming application built with Python, Apache Kafka, and Fa
 
 1. **Clone the repository**
     ```bash
-    git clone https://github.com/b-rine/kafka-ecommerce-stream.git
-    cd kafka-ecommerce-stream
+    git clone https://github.com/b-rine/ecommerce-stream.git
+    cd ecommerce-stream
     ```
 
 2. **Install the Python dependencies**
