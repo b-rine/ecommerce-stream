@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    name: Smoke test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      COMPOSE_FILE: docker/docker-compose.yml:docker/compose.ci.yml
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+      - name: Install smoke-test client
+        run: pip install "$(grep '^websockets==' requirements.txt)"
+      - name: Start stack
+        run: docker compose up -d --build --wait --wait-timeout 300
+      - name: Run smoke test
+        run: python scripts/smoke_test.py
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose logs --no-color --tail 200
+      - name: Stop stack
+        if: always()
+        run: docker compose down -v
