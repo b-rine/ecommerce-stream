@@ -1,14 +1,14 @@
 """Kafka consumer service for processing ecommerce events"""
 
-import json
 import threading
 import logging
 import queue
 import time
 from typing import Optional, List, Set
-from datetime import datetime
+from datetime import UTC, datetime
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
+from kafka.serializer import DefaultSerializer, JsonSerializer
 
 from .config import settings
 from .models import EcommerceEvent, Statistics, EventType
@@ -39,8 +39,8 @@ class KafkaConsumerService:
                 settings.kafka_topic,
                 bootstrap_servers=settings.kafka_bootstrap_servers,
                 group_id=settings.consumer_group_id,
-                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-                key_deserializer=lambda k: k.decode('utf-8') if k else None,
+                value_deserializer=JsonSerializer(),
+                key_deserializer=DefaultSerializer(),
                 auto_offset_reset='earliest',
                 enable_auto_commit=True,
                 consumer_timeout_ms=1000  # Timeout after 1 second of no messages
@@ -160,7 +160,7 @@ class KafkaConsumerService:
                     self.stats.total_revenue += event.total_amount
                     
                     # Track revenue over time
-                    timestamp = datetime.utcnow().isoformat()
+                    timestamp = datetime.now(UTC).replace(tzinfo=None).isoformat()
                     self.stats.revenue_over_time.append({
                         'timestamp': timestamp,
                         'revenue': event.total_amount
@@ -176,7 +176,7 @@ class KafkaConsumerService:
                             self.stats.category_sales.get(category, 0.0) + event.total_amount
             
             # Track events per minute
-            current_minute = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+            current_minute = datetime.now(UTC).replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
             if not self.stats.events_per_minute or \
                self.stats.events_per_minute[-1]['timestamp'] != current_minute:
                 self.stats.events_per_minute.append({

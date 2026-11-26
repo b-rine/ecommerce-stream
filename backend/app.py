@@ -12,7 +12,7 @@ import uvicorn
 from .config import settings
 from .kafka_producer import KafkaProducerService
 from .kafka_consumer import KafkaConsumerService
-from .models import Statistics, StreamStatus, EcommerceEvent
+from .models import Statistics, StreamStatus
 
 
 # Configure logging

@@ -1,0 +1,4 @@
+# CI: run the image as built, so a broken COPY in Dockerfile.backend fails the smoke test.
+services:
+  backend:
+    volumes: !reset []

@@ -3,7 +3,7 @@
 import random
 from typing import List, Optional
 from faker import Faker
-from datetime import datetime
+from datetime import UTC, datetime
 
 from .models import (
     EcommerceEvent, EventType, User, Product, Location, ShippingAddress
@@ -94,7 +94,7 @@ class EventGenerator:
         event_data = {
             'event_id': fake.uuid4(),
             'event_type': event_type,
-            'timestamp': datetime.utcnow().isoformat(),
+            'timestamp': datetime.now(UTC).replace(tzinfo=None).isoformat(),
             'user': user,
             'product': product
         }
