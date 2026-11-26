@@ -2,7 +2,7 @@ fastapi==0.165.0
 uvicorn[standard]==0.54.0
 websockets==17.4
 kafka-python==3.0.13
-faker==40.54.0
+faker==40.63.0
 python-dotenv==1.2.4
 pydantic==2.14.4
 pydantic-settings==2.16.3
