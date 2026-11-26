@@ -111,13 +111,19 @@ def run() -> None:
     print(f"stats ok: total_events={stats['total_events']}")
 
 
-def _hard_timeout(signum, frame):
-    raise SmokeFailure(f"hard timeout after {BUDGET_S + 10}s")
+STOP_BUDGET_S = 15
+
+
+def _timeout_after(seconds: int):
+    def handler(signum, frame):
+        raise SmokeFailure(f"hard timeout after {seconds}s")
+    return handler
 
 
 def stop_stream() -> None:
-    signal.alarm(15)  # cleanup gets its own hard deadline
+    signal.signal(signal.SIGALRM, _timeout_after(STOP_BUDGET_S))
     try:
+        signal.alarm(STOP_BUDGET_S)
         req = urllib.request.Request(BASE + "/api/stream/stop", method="POST")
         urllib.request.urlopen(req, timeout=10).close()
     finally:
@@ -125,24 +131,29 @@ def stop_stream() -> None:
 
 
 def main() -> int:
-    signal.signal(signal.SIGALRM, _hard_timeout)
-    signal.alarm(BUDGET_S + 10)
     failure = None
+    unwinding = True  # stays True only if run() raised something not handled below
     try:
-        run()
+        signal.signal(signal.SIGALRM, _timeout_after(BUDGET_S + 10))
+        try:
+            signal.alarm(BUDGET_S + 10)
+            run()
+        finally:
+            signal.alarm(0)
+        unwinding = False
     except SmokeFailure as e:
-        failure = str(e)
+        failure, unwinding = str(e), False
     except (KeyError, TypeError, AttributeError) as e:
-        failure = f"unexpected response shape: {e!r}"
+        failure, unwinding = f"unexpected response shape: {e!r}", False
     finally:
-        signal.alarm(0)
-    try:
-        stop_stream()
-    except BaseException as e:
-        if failure is None:
-            failure = f"POST /api/stream/stop: {e!r}"
-        else:  # keep the primary failure; report the cleanup one alongside it
-            print(f"warning: stop also failed: {e!r}")
+        # Always stop the stream, even while another exception propagates.
+        try:
+            stop_stream()
+        except Exception as e:
+            if failure is None and not unwinding:
+                failure = f"POST /api/stream/stop: {e!r}"
+            else:  # keep the primary failure; report the cleanup one alongside it
+                print(f"warning: stop also failed: {e!r}")
     if failure is not None:
         print(f"FAIL: {failure}")
         return 1
