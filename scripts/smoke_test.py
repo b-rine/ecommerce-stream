@@ -115,26 +115,37 @@ def _hard_timeout(signum, frame):
     raise SmokeFailure(f"hard timeout after {BUDGET_S + 10}s")
 
 
+def stop_stream() -> None:
+    signal.alarm(15)  # cleanup gets its own hard deadline
+    try:
+        req = urllib.request.Request(BASE + "/api/stream/stop", method="POST")
+        urllib.request.urlopen(req, timeout=10).close()
+    finally:
+        signal.alarm(0)
+
+
 def main() -> int:
     signal.signal(signal.SIGALRM, _hard_timeout)
     signal.alarm(BUDGET_S + 10)
+    failure = None
     try:
         run()
     except SmokeFailure as e:
-        print(f"FAIL: {e}")
-        return 1
+        failure = str(e)
     except (KeyError, TypeError, AttributeError) as e:
-        print(f"FAIL: unexpected response shape: {e!r}")
-        return 1
+        failure = f"unexpected response shape: {e!r}"
     finally:
-        signal.alarm(15)  # cleanup gets its own hard deadline
-        try:
-            req = urllib.request.Request(BASE + "/api/stream/stop", method="POST")
-            urllib.request.urlopen(req, timeout=10).close()
-        except BaseException as e:  # cleanup must not mask the primary result
-            print(f"warning: stop failed: {e!r}")
-        finally:
-            signal.alarm(0)
+        signal.alarm(0)
+    try:
+        stop_stream()
+    except BaseException as e:
+        if failure is None:
+            failure = f"POST /api/stream/stop: {e!r}"
+        else:  # keep the primary failure; report the cleanup one alongside it
+            print(f"warning: stop also failed: {e!r}")
+    if failure is not None:
+        print(f"FAIL: {failure}")
+        return 1
     print("SMOKE TEST PASSED")
     return 0
 
