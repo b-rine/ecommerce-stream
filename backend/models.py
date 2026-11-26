@@ -2,7 +2,7 @@
 
 from enum import Enum
 from datetime import UTC, datetime
-from typing import Optional, Dict, Any
+from typing import Optional, Dict
 from pydantic import BaseModel, ConfigDict, Field
 
 
