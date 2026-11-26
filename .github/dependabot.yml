@@ -17,6 +17,10 @@ updates:
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
+    ignore:
+      # A new Python release can lack wheels; bump the base image by hand.
+      - dependency-name: "python"
+        update-types: ["version-update:semver-major", "version-update:semver-minor"]
     groups:
       minor-and-patch:
         patterns:
