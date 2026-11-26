@@ -17,8 +17,8 @@ fi
 cd "$(dirname "$0")/.."
 
 # Start Docker Compose services
-echo "Starting Docker Compose services (Kafka, Zookeeper)..."
-docker-compose -f docker/docker-compose.yml up -d zookeeper kafka
+echo "Starting Docker Compose services (Kafka)..."
+docker compose -f docker/docker-compose.yml up -d kafka
 
 # Wait for Kafka to be ready
 echo "Waiting for Kafka to be ready..."
