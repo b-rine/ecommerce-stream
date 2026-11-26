@@ -5,7 +5,7 @@ import logging
 import queue
 import time
 from typing import Optional, List, Set
-from datetime import datetime
+from datetime import UTC, datetime
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
 from kafka.serializer import DefaultSerializer, JsonSerializer
@@ -160,7 +160,7 @@ class KafkaConsumerService:
                     self.stats.total_revenue += event.total_amount
                     
                     # Track revenue over time
-                    timestamp = datetime.utcnow().isoformat()
+                    timestamp = datetime.now(UTC).replace(tzinfo=None).isoformat()
                     self.stats.revenue_over_time.append({
                         'timestamp': timestamp,
                         'revenue': event.total_amount
@@ -176,7 +176,7 @@ class KafkaConsumerService:
                             self.stats.category_sales.get(category, 0.0) + event.total_amount
             
             # Track events per minute
-            current_minute = datetime.utcnow().strftime('%Y-%m-%d %H:%M')
+            current_minute = datetime.now(UTC).replace(tzinfo=None).strftime('%Y-%m-%d %H:%M')
             if not self.stats.events_per_minute or \
                self.stats.events_per_minute[-1]['timestamp'] != current_minute:
                 self.stats.events_per_minute.append({

@@ -1,7 +1,7 @@
 """Data models for ecommerce events"""
 
 from enum import Enum
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Optional, Dict, Any
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -52,7 +52,7 @@ class EcommerceEvent(BaseModel):
     """Base ecommerce event model"""
     event_id: str
     event_type: EventType
-    timestamp: str = Field(default_factory=lambda: datetime.utcnow().isoformat())
+    timestamp: str = Field(default_factory=lambda: datetime.now(UTC).replace(tzinfo=None).isoformat())
     user: User
     product: Optional[Product] = None
     
