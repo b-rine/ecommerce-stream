@@ -14,7 +14,7 @@ Branch `chore/kraft-deps` off `origin/main` `c5af4e0`. One PR; one focused commi
   These get fixed here, so the warning gate starts clean.
 - #4 bumps `python:3.11-slim` → `3.15-slim`. A Python release can ship before its wheels do. The image moves to 3.14 (matching the other repos), and Dependabot stops proposing minor/major base-image bumps.
 - `scripts/run_local.sh` checks port 8000, but it serves on 8001. It also calls the v1 `docker-compose` binary.
-- README lists `Python 3.12+` and the pre-rename clone URL (the repo is now `b-rine/kafka-ecommerce-stream`). Its quick start also never installs `requirements.txt`.
+- README lists `Python 3.12+`. (Its clone URL, `b-rine/ecommerce-stream`, is canonical and stays as is; `kafka-ecommerce-stream` is an old name that redirects.) Its quick start also never installs `requirements.txt`.
 - Two unused imports have been on `main` since before this change (pyflakes): `typing.Any` in `models.py` and `EcommerceEvent` in `app.py`.
 
 The prototype (`/tmp/b4593c6a-ecom-proto`, single throwaway commit) passes the verifier below:
@@ -693,10 +693,8 @@ Recorded heads:
  
  1. **Clone the repository**
      ```bash
--    git clone https://github.com/b-rine/ecommerce-stream.git
--    cd ecommerce-stream
-+    git clone https://github.com/b-rine/kafka-ecommerce-stream.git
-+    cd kafka-ecommerce-stream
+     git clone https://github.com/b-rine/ecommerce-stream.git
+     cd ecommerce-stream
      ```
  
 -2. **Run setup executable**
@@ -746,7 +744,7 @@ Recorded heads:
 
 ````bash
 #!/usr/bin/env bash
-# usage: ecom-verify.sh <checkout> <sha>  — verify the kraft/deps branch of kafka-ecommerce-stream.
+# usage: ecom-verify.sh <checkout> <sha>  — verify the kraft/deps branch of ecommerce-stream.
 # Needs ecom-run.sh and ecom-ports.override.yml (host ports 19092/18000) next to this script.
 set -uo pipefail
 C=$1 SHA=$2
