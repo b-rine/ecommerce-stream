@@ -8,6 +8,7 @@ import logging
 from typing import Optional
 from kafka import KafkaProducer
 from kafka.errors import KafkaError
+from kafka.serializer import DefaultSerializer, Serializer
 
 from .config import settings
 from .events import EventGenerator
@@ -15,6 +16,11 @@ from .models import EcommerceEvent
 
 
 logger = logging.getLogger(__name__)
+
+
+class _JsonSerializer(Serializer):
+    def serialize(self, topic, headers, data):
+        return json.dumps(data, default=str).encode('utf-8')
 
 
 class KafkaProducerService:
@@ -33,8 +39,8 @@ class KafkaProducerService:
         try:
             producer = KafkaProducer(
                 bootstrap_servers=settings.kafka_bootstrap_servers,
-                value_serializer=lambda v: json.dumps(v, default=str).encode('utf-8'),
-                key_serializer=lambda k: k.encode('utf-8') if k else None,
+                value_serializer=_JsonSerializer(),
+                key_serializer=DefaultSerializer(),
                 acks='all',  # Wait for all replicas to acknowledge
                 retries=3,
                 max_in_flight_requests_per_connection=1,

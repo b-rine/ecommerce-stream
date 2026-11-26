@@ -1,6 +1,5 @@
 """Kafka consumer service for processing ecommerce events"""
 
-import json
 import threading
 import logging
 import queue
@@ -9,6 +8,7 @@ from typing import Optional, List, Set
 from datetime import datetime
 from kafka import KafkaConsumer
 from kafka.errors import KafkaError
+from kafka.serializer import DefaultSerializer, JsonSerializer
 
 from .config import settings
 from .models import EcommerceEvent, Statistics, EventType
@@ -39,8 +39,8 @@ class KafkaConsumerService:
                 settings.kafka_topic,
                 bootstrap_servers=settings.kafka_bootstrap_servers,
                 group_id=settings.consumer_group_id,
-                value_deserializer=lambda m: json.loads(m.decode('utf-8')),
-                key_deserializer=lambda k: k.decode('utf-8') if k else None,
+                value_deserializer=JsonSerializer(),
+                key_deserializer=DefaultSerializer(),
                 auto_offset_reset='earliest',
                 enable_auto_commit=True,
                 consumer_timeout_ms=1000  # Timeout after 1 second of no messages
