@@ -3,7 +3,7 @@
 from enum import Enum
 from datetime import datetime
 from typing import Optional, Dict, Any
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class EventType(str, Enum):
@@ -67,8 +67,7 @@ class EcommerceEvent(BaseModel):
     rating: Optional[int] = None
     review_text: Optional[str] = None
     
-    class Config:
-        use_enum_values = True
+    model_config = ConfigDict(use_enum_values=True)
 
 
 class Statistics(BaseModel):
